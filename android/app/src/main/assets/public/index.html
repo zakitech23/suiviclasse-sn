@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#1a6b3c"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>SuiviClasse SN</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root{
+  --g:#1a6b3c;--gl:#2a8a50;--gp:#e8f5ee;
+  --gold:#c8941a;--gdp:#fdf6e3;
+  --red:#c0392b;--rdp:#fdecea;
+  --blue:#1a5ba3;--blp:#e8f0fb;
+  --ink:#1a1a2e;--muted:#6b7280;
+  --border:#e5e7eb;--surf:#f9fafb;--white:#fff;
+  --sh:0 1px 3px rgba(0,0,0,.08);--shm:0 4px 14px rgba(0,0,0,.13);
+  --r:12px;--rs:8px;
+  --fd:'Space Grotesk',sans-serif;--fb:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--fb);background:var(--surf);color:var(--ink);min-height:100vh;overscroll-behavior:none}
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+.topbar{background:var(--g);color:#fff;padding:0 14px;height:54px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.tb-back{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0}
+.tb-title{font-family:var(--fd);font-size:16px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-btn{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb)}
+.tb-btn:active{background:rgba(255,255,255,.35)}
+.content{flex:1;overflow-y:auto;padding-bottom:76px}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;height:62px;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.06)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;background:none;border:none;color:var(--muted);font-family:var(--fb);font-size:9px;font-weight:500;transition:color .15s}
+.ni.active{color:var(--g)}
+.ni svg{width:20px;height:20px}
+.screen{display:none}.screen.active{display:block}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1a6b3c 0%,#0d3d22 100%);padding:20px 16px 28px;color:#fff;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:-30px;right:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05)}
+.hero-eye{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;opacity:.7;margin-bottom:5px}
+.hero-title{font-family:var(--fd);font-size:22px;font-weight:700;line-height:1.25;margin-bottom:4px}
+.hero-sub{font-size:12px;opacity:.75}
+.hero-stats{display:flex;gap:16px;margin-top:18px}
+.hs{text-align:center}
+.hs-n{font-family:var(--fd);font-size:24px;font-weight:700;line-height:1}
+.hs-l{font-size:10px;opacity:.7;margin-top:2px}
+
+/* PAGE DE GARDE INFO */
+.pdg-band{background:#fff;margin:14px 16px;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.pdg-band-hdr{background:var(--g);color:#fff;padding:10px 14px;font-family:var(--fd);font-size:13px;font-weight:600}
+.pdg-row{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer}
+.pdg-row:last-child{border-bottom:none}
+.pdg-ic{width:30px;height:30px;border-radius:7px;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.pdg-lbl{font-size:10px;color:var(--muted);margin-bottom:1px}
+.pdg-val{font-size:13px;font-weight:600}
+
+/* QUICK NAV */
+.qnav{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 16px 16px}
+.qn{background:#fff;border-radius:var(--r);padding:14px 12px;box-shadow:var(--sh);text-align:center;cursor:pointer;border:none;transition:transform .1s;width:100%}
+.qn:active{transform:scale(.96)}
+.qn-ic{font-size:26px;margin-bottom:6px}
+.qn-t{font-family:var(--fd);font-size:12px;font-weight:600;color:var(--g);line-height:1.3}
+.qn-s{font-size:10px;color:var(--muted);margin-top:3px}
+
+.sec{padding:14px 16px}
+.sec-title{font-family:var(--fd);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+
+/* CLASSE LIST */
+.cl-item{background:#fff;border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);display:flex;align-items:center;gap:11px;cursor:pointer;transition:transform .1s;border:none;width:100%;text-align:left;margin-bottom:8px}
+.cl-item:active{transform:scale(.98)}
+.cl-icon{width:40px;height:40px;border-radius:9px;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cl-name{font-family:var(--fd);font-size:14px;font-weight:600;margin-bottom:2px}
+.cl-meta{font-size:11px;color:var(--muted)}
+
+/* STUDENT LIST */
+.st-item{background:#fff;border-radius:var(--r);padding:11px 13px;box-shadow:var(--sh);display:flex;align-items:center;gap:11px;cursor:pointer;border:none;width:100%;text-align:left;transition:transform .1s;margin-bottom:7px}
+.st-item:active{transform:scale(.98)}
+.st-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0}
+
+/* FORMS */
+.fg{margin-bottom:12px}
+.fl{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.fc{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:var(--rs);font-family:var(--fb);font-size:13px;color:var(--ink);background:#fff;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+.fc:focus{border-color:var(--g)}
+select.fc{cursor:pointer}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:var(--rs);border:none;font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-p{background:var(--g);color:#fff}.btn-p:active{background:var(--gl);transform:scale(.98)}
+.btn-s{background:var(--gp);color:var(--g)}
+.btn-d{background:var(--rdp);color:var(--red)}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-bl{width:100%}
+.btn-sm{padding:5px 10px;font-size:11px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+
+/* TABS */
+.tabs{display:flex;background:var(--surf);padding:3px;border-radius:9px;margin:12px 16px 0;gap:2px}
+.tab{flex:1;padding:7px 4px;border-radius:7px;border:none;background:none;font-family:var(--fb);font-size:11px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab.active{background:#fff;color:var(--g);font-weight:700;box-shadow:var(--sh)}
+
+/* NOTES TABLE */
+.nt-wrap{overflow-x:auto;padding:0 16px 12px}
+.nt{width:100%;border-collapse:collapse;min-width:340px;font-size:11px}
+.nt th{background:var(--g);color:#fff;padding:7px 8px;font-weight:600;text-align:left;white-space:nowrap}
+.nt th:first-child{border-radius:7px 0 0 0}.nt th:last-child{border-radius:0 7px 0 0}
+.nt td{padding:6px 8px;border-bottom:1px solid var(--border)}
+.nt tr:last-child td{border-bottom:none}
+.nt tr:nth-child(even) td{background:var(--surf)}
+.ni-inp{width:54px;padding:4px 5px;border:1.5px solid var(--border);border-radius:5px;font-size:12px;text-align:center;font-family:var(--fb);color:var(--ink);outline:none;background:#fff}
+.ni-inp:focus{border-color:var(--g)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:2px 6px;border-radius:20px;font-size:10px;font-weight:700}
+.bg-g{background:var(--gp);color:var(--g)}
+.bg-r{background:var(--rdp);color:var(--red)}
+.bg-gold{background:var(--gdp);color:var(--gold)}
+.bg-gray{background:#f3f4f6;color:var(--muted)}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end}
+.mo.open{display:flex}
+.mo-box{background:#fff;border-radius:18px 18px 0 0;width:100%;padding:6px 16px 36px;max-height:92vh;overflow-y:auto;animation:slideUp .22s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mo-handle{width:34px;height:4px;background:var(--border);border-radius:2px;margin:8px auto 14px;display:block}
+.mo-title{font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:14px}
+
+/* TOAST */
+.toast{position:fixed;bottom:72px;left:14px;right:14px;background:var(--ink);color:#fff;padding:10px 13px;border-radius:9px;font-size:12px;font-weight:500;z-index:300;display:none;box-shadow:var(--shm)}
+
+/* FAB */
+.fab{position:fixed;bottom:72px;right:14px;width:50px;height:50px;border-radius:50%;background:var(--g);color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:var(--shm);display:flex;align-items:center;justify-content:center;z-index:50;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px}
+.empty-ic{font-size:42px;margin-bottom:10px}
+.empty-t{font-family:var(--fd);font-size:15px;font-weight:600;margin-bottom:5px}
+.empty-s{font-size:12px;color:var(--muted);margin-bottom:16px}
+
+/* STATS / SYNTHESE */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc{background:#fff;border-radius:var(--r);padding:12px;box-shadow:var(--sh);text-align:center}
+.sn{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--g);line-height:1}
+.sl{font-size:10px;color:var(--muted);margin-top:3px}
+.bar-item{margin-bottom:9px}
+.bar-lbl{font-size:10px;font-weight:500;margin-bottom:3px;display:flex;justify-content:space-between}
+.bar-tr{height:6px;background:var(--border);border-radius:4px;overflow:hidden}
+.bar-fl{height:100%;border-radius:4px;transition:width .5s ease}
+
+/* BULLETIN */
+.bull{background:#fff;margin:12px 16px;border-radius:var(--r);border:2.5px solid var(--g);overflow:hidden;box-shadow:var(--shm)}
+.bull-hdr{background:var(--g);color:#fff;padding:10px 14px;text-align:center}
+.bull-rep{font-size:9px;opacity:.85;line-height:1.5}
+.bull-title{font-family:var(--fd);font-size:13px;font-weight:700;margin:3px 0}
+.bull-body{padding:10px 14px}
+.bull-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
+.bull-lbl{color:var(--muted)}.bull-val{font-weight:600}
+.bull-sep{border:none;border-top:1px solid var(--border);margin:7px 0}
+.bull-nt{width:100%;border-collapse:collapse;font-size:10px}
+.bull-nt th{background:var(--gp);color:var(--g);padding:4px 5px;font-weight:700;text-align:left;border:1px solid var(--border)}
+.bull-nt td{padding:3px 5px;border:1px solid var(--border)}
+.bull-avg{font-family:var(--fd);font-size:19px;font-weight:700;text-align:center;padding:7px 0}
+.bull-foot{background:var(--surf);padding:8px 14px;display:flex;justify-content:space-between;font-size:11px;border-top:1px solid var(--border)}
+.bull-sig{display:flex;justify-content:space-between;padding:9px 14px;font-size:9px;color:var(--muted);border-top:1px solid var(--border)}
+
+/* PASSAGE */
+.pp-item{background:#fff;border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);margin-bottom:8px}
+.pp-avgs{display:flex;gap:6px;margin:8px 0}
+.pp-avg{text-align:center;flex:1;background:var(--surf);border-radius:6px;padding:5px 3px}
+.pp-av-n{font-family:var(--fd);font-size:13px;font-weight:700}
+.pp-av-l{font-size:9px;color:var(--muted);margin-top:1px}
+.pp-dec{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+
+/* SETTINGS */
+.set-item{background:#fff;border-radius:var(--rs);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:7px;box-shadow:var(--sh);cursor:pointer}
+.set-ic{width:32px;height:32px;border-radius:7px;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.set-lbl{font-size:13px;font-weight:500;flex:1}
+.set-val{font-size:11px;color:var(--muted)}
+
+/* PRETEST boxes */
+.pt-box{background:var(--gp);border-radius:var(--rs);padding:10px 14px;margin:0 16px 10px;display:flex;justify-content:space-between;align-items:center}
+
+/* info band */
+.info-band{background:var(--gp);border-bottom:1px solid #b7dfc6;padding:6px 14px;display:flex;align-items:center;gap:7px;font-size:11px;color:var(--g);font-weight:500}
+
+/* domain group headers */
+.dom-hdr{background:rgba(26,107,60,.07);padding:5px 8px;font-size:10px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.4px}
+
+.p16{padding:16px}
+.text-muted{color:var(--muted);font-size:11px}
+.fw700{font-weight:700}
+.fam-fd{font-family:var(--fd)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <button class="tb-back" id="backBtn" style="display:none" onclick="goBack()">&#8592;</button>
+  <span class="tb-title" id="tbTitle">SuiviClasse SN</span>
+  <button class="tb-btn" id="tbBtn" style="display:none" onclick="tbBtnAction()"></button>
+</div>
+
+<div class="content">
+
+<!-- ██ HOME ██ -->
+<div class="screen active" id="sc-home">
+  <div class="hero">
+    <div class="hero-eye">🇸🇳 République du Sénégal – IEF <span id="h-ief">—</span></div>
+    <div class="hero-title" id="h-ecole">SuiviClasse SN</div>
+    <div class="hero-sub" id="h-annee">Outils de suivi des performances des élèves</div>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-n" id="h-nc">0</div><div class="hs-l">Classes</div></div>
+      <div class="hs"><div class="hs-n" id="h-ne">0</div><div class="hs-l">Élèves</div></div>
+      <div class="hs"><div class="hs-n" id="h-nb">0</div><div class="hs-l">Notes saisies</div></div>
+    </div>
+  </div>
+
+  <!-- PAGE DE GARDE -->
+  <div class="pdg-band">
+    <div class="pdg-band-hdr">📋 Page de Garde – Informations établissement</div>
+    <div class="pdg-row" onclick="editParam('ia','IA (Inspection Académique)')">
+      <div class="pdg-ic">🏛️</div><div style="flex:1"><div class="pdg-lbl">IA</div><div class="pdg-val" id="pdg-ia">—</div></div><div style="color:var(--muted)">›</div>
+    </div>
+    <div class="pdg-row" onclick="editParam('ief','IEF')">
+      <div class="pdg-ic">📍</div><div style="flex:1"><div class="pdg-lbl">IEF</div><div class="pdg-val" id="pdg-ief">—</div></div><div style="color:var(--muted)">›</div>
+    </div>
+    <div class="pdg-row" onclick="editParam('district','District')">
+      <div class="pdg-ic">🗺️</div><div style="flex:1"><div class="pdg-lbl">District</div><div class="pdg-val" id="pdg-district">—</div></div><div style="color:var(--muted)">›</div>
+    </div>
+    <div class="pdg-row" onclick="editParam('codec','CODEC')">
+      <div class="pdg-ic">🔢</div><div style="flex:1"><div class="pdg-lbl">CODEC</div><div class="pdg-val" id="pdg-codec">—</div></div><div style="color:var(--muted)">›</div>
+    </div>
+    <div class="pdg-row" onclick="editParam('ecole','École')">
+      <div class="pdg-ic">🏫</div><div style="flex:1"><div class="pdg-lbl">École</div><div class="pdg-val" id="pdg-ecole">—</div></div><div style="color:var(--muted)">›</div>
+    </div>
+    <div class="pdg-row" onclick="editParam('annee','Année scolaire')">
+      <div class="pdg-ic">📅</div><div style="flex:1"><div class="pdg-lbl">Année scolaire</div><div class="pdg-val" id="pdg-annee">2025-2026</div></div><div style="color:var(--muted)">›</div>
+    </div>
+    <div class="pdg-row" onclick="editParam('maitre','Maître / Maîtresse')">
+      <div class="pdg-ic">👨‍🏫</div><div style="flex:1"><div class="pdg-lbl">Maître</div><div class="pdg-val" id="pdg-maitre">—</div></div><div style="color:var(--muted)">›</div>
+    </div>
+    <div class="pdg-row" onclick="editParam('oustas','Oustas')">
+      <div class="pdg-ic">🕌</div><div style="flex:1"><div class="pdg-lbl">Oustas</div><div class="pdg-val" id="pdg-oustas">—</div></div><div style="color:var(--muted)">›</div>
+    </div>
+  </div>
+
+  <!-- QUICK NAV -->
+  <div class="sec"><div class="sec-title">Navigation rapide</div></div>
+  <div class="qnav">
+    <button class="qn" onclick="navigate('saisie')"><div class="qn-ic">✏️</div><div class="qn-t">Saisie des Notes</div><div class="qn-s">Prétest · Compos 1-3</div></button>
+    <button class="qn" onclick="navigate('bulletins')"><div class="qn-ic">📄</div><div class="qn-t">Bulletins</div><div class="qn-s">Par trimestre</div></button>
+    <button class="qn" onclick="navigate('synthese')"><div class="qn-ic">📊</div><div class="qn-t">Synthèse Classe</div><div class="qn-s">Statistiques</div></button>
+    <button class="qn" onclick="navigate('passage')"><div class="qn-ic">🎓</div><div class="qn-t">Proposition de Passage</div><div class="qn-s">Décision annuelle</div></button>
+  </div>
+
+  <!-- CLASSES -->
+  <div class="sec">
+    <div class="sec-title">Mes Classes</div>
+    <div id="home-classes"></div>
+  </div>
+</div>
+
+<!-- ██ SAISIE ██ -->
+<div class="screen" id="sc-saisie">
+  <div class="tabs" id="saisie-tabs">
+    <button class="tab active" onclick="setSaisieTab('pretest')">Prétest</button>
+    <button class="tab" onclick="setSaisieTab('c1')">Compo 1</button>
+    <button class="tab" onclick="setSaisieTab('c2')">Compo 2</button>
+    <button class="tab" onclick="setSaisieTab('c3')">Compo 3</button>
+  </div>
+  <div id="saisie-body" style="padding-top:10px"></div>
+</div>
+
+<!-- ██ NOTES ELEVE ██ -->
+<div class="screen" id="sc-notes">
+  <div class="info-band" id="notes-saved" style="display:none">💾 Notes sauvegardées automatiquement</div>
+  <div style="padding:12px 16px 6px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-weight:700;font-size:15px;font-family:var(--fd)" id="notes-sname"></div>
+      <div class="text-muted" id="notes-sinfo"></div>
+    </div>
+    <div>
+      <div style="font-family:var(--fd);font-size:20px;font-weight:700;text-align:right" id="notes-total"></div>
+      <div class="text-muted" style="text-align:right" id="notes-pct"></div>
+    </div>
+  </div>
+  <div class="nt-wrap" id="notes-table-wrap"></div>
+  <div class="p16">
+    <button class="btn btn-p btn-bl" onclick="saveNotesBack()">💾 Sauvegarder et retour</button>
+  </div>
+</div>
+
+<!-- ██ BULLETINS ██ -->
+<div class="screen" id="sc-bulletins">
+  <div class="tabs" id="bull-tabs">
+    <button class="tab active" onclick="setBullTab(1)">1er Trim.</button>
+    <button class="tab" onclick="setBullTab(2)">2ème Trim.</button>
+    <button class="tab" onclick="setBullTab(3)">3ème Trim.</button>
+  </div>
+  <div id="bull-list" style="padding:10px 16px 0"></div>
+</div>
+
+<!-- ██ BULLETIN DETAIL ██ -->
+<div class="screen" id="sc-bull">
+  <div id="bull-content"></div>
+  <div class="p16">
+    <button class="btn btn-gold btn-bl" onclick="printBull()">🖨️ Imprimer / PDF</button>
+    <button class="btn btn-s btn-bl mt8" onclick="goBack()">← Retour liste</button>
+  </div>
+</div>
+
+<!-- ██ SYNTHESE ██ -->
+<div class="screen" id="sc-synthese">
+  <div class="tabs" id="syn-tabs">
+    <button class="tab active" onclick="setSynTab('pretest')">Prétest</button>
+    <button class="tab" onclick="setSynTab('c1')">Compo 1</button>
+    <button class="tab" onclick="setSynTab('c2')">Compo 2</button>
+    <button class="tab" onclick="setSynTab('c3')">Compo 3</button>
+  </div>
+  <div id="syn-body" style="padding:10px 16px 0"></div>
+</div>
+
+<!-- ██ PASSAGE ██ -->
+<div class="screen" id="sc-passage">
+  <div id="passage-body" style="padding:12px 16px 0"></div>
+</div>
+
+<!-- ██ PARAMS ██ -->
+<div class="screen" id="sc-params">
+  <div class="sec">
+    <div class="sec-title">Données</div>
+    <div class="set-item" onclick="exportDB()"><div class="set-ic">📤</div><div class="set-lbl">Exporter les données</div><div class="set-val">JSON</div></div>
+    <div class="set-item" onclick="importDB()"><div class="set-ic">📥</div><div class="set-lbl">Importer des données</div><div class="set-val">Restaurer</div></div>
+    <div class="mt12"><div class="sec-title">Classes enregistrées</div><div id="param-classes"></div></div>
+    <button class="btn btn-p btn-bl mt8" onclick="showAddClasseModal()">＋ Ajouter une classe</button>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="ni active" id="nav-home" onclick="navigate('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Accueil
+  </button>
+  <button class="ni" id="nav-saisie" onclick="navigate('saisie')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Saisie
+  </button>
+  <button class="ni" id="nav-bulletins" onclick="navigate('bulletins')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Bulletins
+  </button>
+  <button class="ni" id="nav-synthese" onclick="navigate('synthese')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Synthèse
+  </button>
+  <button class="ni" id="nav-params" onclick="navigate('params')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Paramètres
+  </button>
+</nav>
+
+<button class="fab" id="fab" onclick="fabAction()">＋</button>
+</div>
+
+<div class="mo" id="modal" onclick="moOverlay(event)">
+  <div class="mo-box"><span class="mo-handle"></span><div id="modal-body"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  GRILLE OFFICIELLE – Document CM_2026_SUIVI
+// ═══════════════════════════════════════════════
+const TABS = ['pretest','c1','c2','c3'];
+const TAB_LABELS = {pretest:'Prétest', c1:'Compo 1', c2:'Compo 2', c3:'Compo 3'};
+const TAB_FULL = {pretest:'Prétest', c1:'1ère Composition', c2:'2ème Composition', c3:'3ème Composition'};
+const TRIM_LABEL = ['1er','2ème','3ème'];
+
+// Grille commune Compo 1, 2, 3
+const MATIERES_COMPO = [
+  { dom:'LANGUE ET COMMUNICATION', mat:'Ressources', max:40, key:'lc_r' },
+  { dom:'LANGUE ET COMMUNICATION', mat:'Compétence', max:60, key:'lc_c' },
+  { dom:'MATHÉMATIQUES',           mat:'Ressources', max:40, key:'ma_r' },
+  { dom:'MATHÉMATIQUES',           mat:'Compétence', max:60, key:'ma_c' },
+  { dom:'DÉCOUVERTE DU MONDE',     mat:'Ressources', max:24, key:'dm_r' },
+  { dom:'DÉCOUVERTE DU MONDE',     mat:'Compétence', max:16, key:'dm_c' },
+  { dom:'DÉVELOPPEMENT DURABLE',   mat:'Ressources', max:24, key:'dd_r' },
+  { dom:'DÉVELOPPEMENT DURABLE',   mat:'Compétence', max:16, key:'dd_c' },
+  { dom:'EPSA',                    mat:'Arts plastiques', max:10, key:'ap' },
+  { dom:'EPSA',                    mat:'Récitation / Chant', max:10, key:'rc' },
+  { dom:'LANGUE ÉTRANGÈRE',        mat:'Arabe', max:10, key:'ar' },
+];
+const TOTAL_MAX_COMPO = MATIERES_COMPO.reduce((s,m)=>s+m.max,0); // 310
+
+const MATIERES_PRETEST = [
+  { dom:'LANGUE ET COMMUNICATION', mat:'Ressources', max:40, key:'lc_r' },
+  { dom:'LANGUE ET COMMUNICATION', mat:'Compétence', max:60, key:'lc_c' },
+  { dom:'MATHÉMATIQUES',           mat:'Ressources', max:40, key:'ma_r' },
+  { dom:'MATHÉMATIQUES',           mat:'Compétence', max:60, key:'ma_c' },
+  { dom:'DÉCOUVERTE DU MONDE',     mat:'Ressources', max:24, key:'dm_r' },
+  { dom:'DÉCOUVERTE DU MONDE',     mat:'Compétence', max:16, key:'dm_c' },
+];
+const TOTAL_MAX_PRETEST = 240;
+
+function getGrille(tab){
+  return tab==='pretest'
+    ? {matieres:MATIERES_PRETEST, totalMax:TOTAL_MAX_PRETEST}
+    : {matieres:MATIERES_COMPO,   totalMax:TOTAL_MAX_COMPO};
+}
+
+// Appréciations basées sur % par rapport au total
+const APPRS = [
+  {min:90, label:'Excellent',   color:'#155724'},
+  {min:80, label:'Très Bien',   color:'#1a6b3c'},
+  {min:70, label:'Bien',        color:'#2a8a50'},
+  {min:60, label:'Assez Bien',  color:'#c8941a'},
+  {min:50, label:'Passable',    color:'#e67e22'},
+  {min:0,  label:'Insuffisant', color:'#c0392b'},
+];
+function getAppr(total, max){
+  const pct = total/max*100;
+  return APPRS.find(a=>pct>=a.min)||APPRS[APPRS.length-1];
+}
+
+const AVCOLS=['#1a6b3c','#2980b9','#8e44ad','#e74c3c','#d35400','#16a085','#6c3483','#2c3e50','#1abc9c','#e67e22'];
+
+// ═══════════════════════════════════════════════
+//  DATABASE
+// ═══════════════════════════════════════════════
+let db = loadDB();
+function loadDB(){
+  try{
+    const d = JSON.parse(localStorage.getItem('sc_db2026')||'null');
+    if(d && d.classes) return d;
+  }catch(e){}
+  return {
+    settings:{ia:'ZIGUINCHOR',ief:'BIGNONA2',district:'',codec:'',ecole:'',annee:'2025-2026',maitre:'',oustas:''},
+    classes:[]
+  };
+}
+function saveDB(){ localStorage.setItem('sc_db2026', JSON.stringify(db)); }
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+let curScreen='home', navStack=[];
+let curClasse=null, curStudent=null;
+let saisieTab='c1', bullTab=1, synTab='pretest';
+
+const SCREENS = {
+  home:'sc-home', saisie:'sc-saisie', notes:'sc-notes',
+  bulletins:'sc-bulletins', bull:'sc-bull',
+  synthese:'sc-synthese', passage:'sc-passage', params:'sc-params'
+};
+const NAV_IDS = ['home','saisie','bulletins','synthese','params'];
+
+function navigate(screen, push=true){
+  if(push && curScreen!==screen) navStack.push(curScreen);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(SCREENS[screen])?.classList.add('active');
+  curScreen=screen;
+
+  const back=document.getElementById('backBtn');
+  const fab=document.getElementById('fab');
+  const tbBtn=document.getElementById('tbBtn');
+  back.style.display = navStack.length?'flex':'none';
+  tbBtn.style.display='none';
+  fab.style.display='flex';
+
+  NAV_IDS.forEach(id=>{
+    document.getElementById('nav-'+id)?.classList.toggle('active',
+      id===screen || (id==='synthese'&&screen==='synthese') || (id==='bulletins'&&screen==='bull'));
+  });
+
+  switch(screen){
+    case 'home':
+      document.getElementById('tbTitle').textContent='SuiviClasse SN';
+      navStack=[]; fab.onclick=()=>showAddClasseModal();
+      renderHome(); break;
+    case 'saisie':
+      document.getElementById('tbTitle').textContent=curClasse?curClasse.nom:'Saisie des Notes';
+      fab.onclick=()=>curClasse?showAddStudentModal():showAddClasseModal();
+      renderSaisie(); break;
+    case 'notes':
+      document.getElementById('tbTitle').textContent=`${TAB_FULL[saisieTab]}`;
+      fab.style.display='none'; renderNotes(); break;
+    case 'bulletins':
+      document.getElementById('tbTitle').textContent='Bulletins de Notes';
+      fab.style.display='none'; renderBulletins(); break;
+    case 'bull':
+      document.getElementById('tbTitle').textContent='Bulletin';
+      fab.style.display='none'; renderBullDetail(); break;
+    case 'synthese':
+      document.getElementById('tbTitle').textContent='Synthèse Classe';
+      fab.style.display='none'; renderSynthese(); break;
+    case 'passage':
+      document.getElementById('tbTitle').textContent='Proposition de Passage';
+      fab.style.display='none'; renderPassage(); break;
+    case 'params':
+      document.getElementById('tbTitle').textContent='Paramètres';
+      fab.style.display='none'; renderParams(); break;
+  }
+}
+function goBack(){
+  if(!navStack.length) return;
+  navigate(navStack.pop(), false);
+}
+function fabAction(){ if(curClasse) showAddStudentModal(); else showAddClasseModal(); }
+function tbBtnAction(){}
+
+// ═══════════════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════════════
+function renderHome(){
+  const s=db.settings, cs=db.classes;
+  document.getElementById('h-ief').textContent=s.ief||'—';
+  document.getElementById('h-ecole').textContent=s.ecole||'SuiviClasse SN';
+  document.getElementById('h-annee').textContent=s.annee?`Année scolaire ${s.annee}`:'Outils de suivi des performances';
+  document.getElementById('h-nc').textContent=cs.length;
+  let totalE=0, totalN=0;
+  cs.forEach(c=>{
+    totalE+=c.eleves.length;
+    c.eleves.forEach(e=>{ TABS.forEach(tab=>{ if(e.notes?.[tab] && Object.values(e.notes[tab]).some(v=>v!=='')) totalN++; }); });
+  });
+  document.getElementById('h-ne').textContent=totalE;
+  document.getElementById('h-nb').textContent=totalN;
+
+  // Page de garde fields
+  ['ia','ief','district','codec','ecole','annee','maitre','oustas'].forEach(k=>{
+    const el=document.getElementById('pdg-'+k);
+    if(el) el.textContent=s[k]||'—';
+  });
+
+  // Classes
+  const el=document.getElementById('home-classes');
+  if(!cs.length){
+    el.innerHTML=`<div class="empty"><div class="empty-ic">🏫</div><div class="empty-t">Aucune classe</div><div class="empty-s">Commencez par créer une classe</div><button class="btn btn-p" onclick="showAddClasseModal()">＋ Créer une classe</button></div>`;
+    return;
+  }
+  el.innerHTML=cs.map((c,i)=>{
+    const moy=getClasseMoyenne(c,'c1');
+    return `<button class="cl-item" onclick="openClasse(${i})">
+      <div class="cl-icon">${c.emoji||'📚'}</div>
+      <div style="flex:1"><div class="cl-name">${c.nom}</div>
+      <div class="cl-meta">${c.eleves.length} élève${c.eleves.length>1?'s':''} · ${c.type}${moy!==null?' · Moy. C1: '+moy+'pts':''}</div></div>
+      <div style="color:var(--muted)">›</div>
+    </button>`;
+  }).join('');
+}
+function openClasse(idx){
+  curClasse=db.classes[idx]; curClasse._idx=idx;
+  saisieTab='c1';
+  navigate('saisie');
+}
+
+// ═══════════════════════════════════════════════
+//  SAISIE
+// ═══════════════════════════════════════════════
+function setSaisieTab(tab){
+  saisieTab=tab;
+  document.querySelectorAll('#saisie-tabs .tab').forEach((t,i)=>t.classList.toggle('active',TABS[i]===tab));
+  renderSaisie();
+}
+function renderSaisie(){
+  const body=document.getElementById('saisie-body');
+  if(!curClasse){
+    if(!db.classes.length){
+      body.innerHTML=`<div class="sec"><div class="empty"><div class="empty-ic">✏️</div><div class="empty-t">Aucune classe</div><div class="empty-s">Créez une classe d'abord</div><button class="btn btn-p" onclick="showAddClasseModal()">＋ Ajouter</button></div></div>`;
+      return;
+    }
+    body.innerHTML='<div class="sec"><div class="sec-title">Sélectionner une classe</div>'+
+      db.classes.map((c,i)=>`<button class="cl-item" onclick="openClasse(${i})">
+        <div class="cl-icon">${c.emoji||'📚'}</div>
+        <div style="flex:1"><div class="cl-name">${c.nom}</div><div class="cl-meta">${c.eleves.length} élève${c.eleves.length>1?'s':''}</div></div>
+        <div style="color:var(--muted)">›</div></button>`).join('')+'</div>';
+    return;
+  }
+  const {eleves}=curClasse;
+  document.getElementById('tbTitle').textContent=curClasse.nom+' – '+TAB_LABELS[saisieTab];
+  document.getElementById('fab').onclick=()=>showAddStudentModal();
+
+  if(!eleves.length){
+    body.innerHTML=`<div class="sec"><div class="empty"><div class="empty-ic">👦</div><div class="empty-t">Aucun élève</div><div class="empty-s">Ajoutez des élèves à cette classe</div><button class="btn btn-p" onclick="showAddStudentModal()">＋ Ajouter</button></div></div>`;
+    return;
+  }
+  const g=getGrille(saisieTab);
+  body.innerHTML='<div style="padding:0 16px 12px">'+
+    eleves.map((e,i)=>{
+      const tot=getTotal(e,saisieTab);
+      const pct=tot!==null?Math.round(tot/g.totalMax*100):null;
+      const col=AVCOLS[i%AVCOLS.length];
+      const ini=(e.prenom?.[0]||'')+(e.nom?.[0]||'');
+      const appr=tot!==null?getAppr(tot,g.totalMax):null;
+      return `<button class="st-item" onclick="openStudentNotes(${i})">
+        <div class="st-av" style="background:${col}">${ini.toUpperCase()}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px">${e.prenom} ${e.nom} ${e.sexe==='F'?'👧':e.sexe==='M'?'👦':''}</div>
+          <div class="text-muted">${pct!==null?`${tot} / ${g.totalMax} pts (${pct}%)`:'Notes non saisies'}</div>
+        </div>
+        ${pct!==null?`<span class="badge ${pct>=50?'bg-g':'bg-r'}">${pct>=50?'≥50%':'<50%'}</span>`:''}
+      </button>`;
+    }).join('')+'</div>';
+}
+function openStudentNotes(idx){
+  curStudent=curClasse.eleves[idx]; curStudent._idx=idx;
+  navigate('notes');
+}
+
+// ═══════════════════════════════════════════════
+//  NOTES ELEVE
+// ═══════════════════════════════════════════════
+function renderNotes(){
+  const e=curStudent, g=getGrille(saisieTab);
+  document.getElementById('notes-sname').textContent=`${e.prenom} ${e.nom}`;
+  document.getElementById('notes-sinfo').textContent=`${curClasse.nom} · ${TAB_FULL[saisieTab]}`;
+  if(!e.notes) e.notes={};
+  if(!e.notes[saisieTab]) e.notes[saisieTab]={};
+
+  // Group by domain
+  let lastDom='', rows='';
+  g.matieres.forEach((m,i)=>{
+    const v=e.notes[saisieTab][m.key];
+    const val=v!==undefined&&v!==''?v:'';
+    if(m.dom!==lastDom){
+      lastDom=m.dom;
+      rows+=`<tr><td colspan="4" class="dom-hdr">${m.dom}</td></tr>`;
+    }
+    rows+=`<tr>
+      <td style="font-weight:500">${m.mat}</td>
+      <td style="text-align:center"><span class="badge bg-gray">${m.max}</span></td>
+      <td style="text-align:center">
+        <input type="number" class="ni-inp" min="0" max="${m.max}" step="0.5"
+          value="${val}" placeholder="—"
+          onchange="noteChange('${m.key}',this.value,${m.max})"
+          oninput="recalcTotal()"/>
+      </td>
+      <td style="text-align:center;font-size:11px" id="pct_${m.key}">
+        ${val!==''?`<span class="badge ${parseFloat(val)/m.max>=.5?'bg-g':'bg-r'}">${Math.round(parseFloat(val)/m.max*100)}%</span>`:'—'}
+      </td>
+    </tr>`;
+  });
+
+  document.getElementById('notes-table-wrap').innerHTML=`
+    <table class="nt">
+      <thead><tr><th>Discipline</th><th style="text-align:center">Max</th><th style="text-align:center">Note</th><th style="text-align:center">≥50%</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  recalcTotal();
+}
+
+function noteChange(key, val, max){
+  if(!curStudent.notes) curStudent.notes={};
+  if(!curStudent.notes[saisieTab]) curStudent.notes[saisieTab]={};
+  const n=val===''?'':Math.min(parseFloat(val),max);
+  curStudent.notes[saisieTab][key]=n;
+  db.classes[curClasse._idx]=curClasse;
+  saveDB();
+  // Update pct badge
+  const pctEl=document.getElementById('pct_'+key);
+  if(pctEl){
+    if(val!==''){
+      const pct=Math.round(n/max*100);
+      pctEl.innerHTML=`<span class="badge ${pct>=50?'bg-g':'bg-r'}">${pct}%</span>`;
+    } else { pctEl.textContent='—'; }
+  }
+  // Show saved indicator
+  const band=document.getElementById('notes-saved');
+  band.style.display='flex'; clearTimeout(band._t); band._t=setTimeout(()=>band.style.display='none',1800);
+}
+
+function recalcTotal(){
+  const g=getGrille(saisieTab);
+  const notes=curStudent.notes?.[saisieTab]||{};
+  let tot=0, any=false;
+  g.matieres.forEach(m=>{
+    const v=notes[m.key];
+    if(v!==undefined&&v!==''&&!isNaN(parseFloat(v))){ tot+=parseFloat(v); any=true; }
+  });
+  const totEl=document.getElementById('notes-total');
+  const pctEl=document.getElementById('notes-pct');
+  if(any){
+    const pct=Math.round(tot/g.totalMax*100);
+    const appr=getAppr(tot,g.totalMax);
+    totEl.textContent=tot.toFixed(1)+' / '+g.totalMax+' pts';
+    totEl.style.color=appr.color;
+    pctEl.textContent=`${pct}% · ${appr.label}`;
+    pctEl.style.color=appr.color;
+  } else {
+    totEl.textContent='— pts'; totEl.style.color='var(--muted)';
+    pctEl.textContent=''; 
+  }
+}
+function saveNotesBack(){
+  db.classes[curClasse._idx]=curClasse; saveDB();
+  showToast('✅ Notes sauvegardées'); goBack();
+}
+
+// ═══════════════════════════════════════════════
+//  BULLETINS
+// ═══════════════════════════════════════════════
+function setBullTab(t){
+  bullTab=t;
+  document.querySelectorAll('#bull-tabs .tab').forEach((tb,i)=>tb.classList.toggle('active',i+1===t));
+  renderBulletins();
+}
+function renderBulletins(){
+  const body=document.getElementById('bull-list');
+  if(!db.classes.length){body.innerHTML=`<div class="empty"><div class="empty-ic">📄</div><div class="empty-t">Aucune classe</div></div>`;return;}
+  const tabKey=['c1','c2','c3'][bullTab-1];
+  const g=getGrille(tabKey);
+  let html='';
+  db.classes.forEach((c,ci)=>{
+    if(!c.eleves.length) return;
+    html+=`<div style="margin-bottom:4px"><div class="sec-title">${c.emoji||'📚'} ${c.nom}</div>`;
+    html+=c.eleves.map((e,ei)=>{
+      const tot=getTotal(e,tabKey);
+      const rang=getRang(c,ei,tabKey);
+      const appr=tot!==null?getAppr(tot,g.totalMax):null;
+      const pct=tot!==null?Math.round(tot/g.totalMax*100):null;
+      const ini=(e.prenom?.[0]||'')+(e.nom?.[0]||'');
+      const col=AVCOLS[ei%AVCOLS.length];
+      return `<button class="st-item" onclick="openBull(${ci},${ei})">
+        <div class="st-av" style="background:${col}">${ini.toUpperCase()}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px">${e.prenom} ${e.nom}</div>
+          <div class="text-muted">${tot!==null?`${tot}/${g.totalMax} pts · ${pct}% · Rang ${rang}/${c.eleves.length}`:'Notes non saisies'}</div>
+        </div>
+        ${appr?`<span class="badge" style="background:${appr.color}22;color:${appr.color}">${appr.label}</span>`:''}
+      </button>`;
+    }).join('');
+    html+='</div>';
+  });
+  body.innerHTML=html||`<div class="empty"><div class="empty-ic">📊</div><div class="empty-t">Aucune note saisie</div></div>`;
+}
+function openBull(ci,ei){
+  curClasse=db.classes[ci]; curClasse._idx=ci;
+  curStudent=curClasse.eleves[ei]; curStudent._idx=ei;
+  navigate('bull');
+}
+function renderBullDetail(){
+  const e=curStudent, c=curClasse, s=db.settings;
+  const tabKey=['c1','c2','c3'][bullTab-1];
+  const g=getGrille(tabKey);
+  const notes=e.notes?.[tabKey]||{};
+  const tot=getTotal(e,tabKey);
+  const appr=tot!==null?getAppr(tot,g.totalMax):null;
+  const rang=getRang(c,curStudent._idx,tabKey);
+  const moyC=getMoyenneClasse(c,tabKey);
+  const garcons=c.eleves.filter(x=>x.sexe==='M').length;
+  const filles=c.eleves.filter(x=>x.sexe==='F').length;
+  const moy10=tot!==null?((tot/g.totalMax)*10).toFixed(2):null;
+
+  let rows='';
+  g.matieres.forEach(m=>{
+    const v=notes[m.key]; const n=v!==undefined&&v!==''?parseFloat(v):null;
+    const ok=n!==null&&n/m.max>=0.5;
+    rows+=`<tr>
+      <td>${m.dom}</td><td>${m.mat}</td>
+      <td style="text-align:center">${m.max}</td>
+      <td style="text-align:center;font-weight:700;color:${n!==null?(ok?'var(--g)':'var(--red)'):'var(--muted)'}">${n!==null?n:'—'}</td>
+      <td style="text-align:center">${n!==null?`<span style="font-size:9px;font-weight:700;color:${ok?'var(--g)':'var(--red)'}">${ok?'Oui':'Non'}</span>`:'—'}</td>
+    </tr>`;
+  });
+
+  document.getElementById('bull-content').innerHTML=`
+  <div class="bull">
+    <div class="bull-hdr">
+      <div class="bull-rep">République Du Sénégal – Un Peuple – Un But – Une Foi</div>
+      <div class="bull-title">BULLETIN DE NOTES ${TRIM_LABEL[bullTab-1]} TRIMESTRE</div>
+      <div class="bull-rep">IA : ${s.ia||'—'} &nbsp;|&nbsp; IEF : ${s.ief||'—'} &nbsp;|&nbsp; A.S. : ${s.annee||'—'}</div>
+    </div>
+    <div class="bull-body">
+      <div class="bull-row"><span class="bull-lbl">École :</span><span class="bull-val">${s.ecole||'—'}</span></div>
+      <div class="bull-row"><span class="bull-lbl">District / CODEC :</span><span class="bull-val">${[s.district,s.codec].filter(Boolean).join(' / ')||'—'}</span></div>
+      <div class="bull-row"><span class="bull-lbl">Maître :</span><span class="bull-val">${s.maitre||'—'}</span></div>
+      <div class="bull-row"><span class="bull-lbl">Oustas :</span><span class="bull-val">${s.oustas||'—'}</span></div>
+      <div class="bull-row"><span class="bull-lbl">Classe :</span><span class="bull-val">${c.nom}</span></div>
+      <div class="bull-row"><span class="bull-lbl">Garçons :</span><span class="bull-val">${garcons} &nbsp; Filles : ${filles} &nbsp; Total : ${c.eleves.length}</span></div>
+      <div class="bull-row"><span class="bull-lbl">Élève :</span><span class="bull-val">${e.prenom} ${e.nom} ${e.sexe==='F'?'(Fille)':e.sexe==='M'?'(Garçon)':''}</span></div>
+      <div class="bull-sep"></div>
+      <table class="bull-nt">
+        <thead><tr><th>Domaines</th><th>Disciplines</th><th style="text-align:center">Max</th><th style="text-align:center">Note</th><th style="text-align:center">≥50%</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="bull-avg" style="color:${appr?.color||'var(--muted)'}">
+        ${tot!==null?tot+' / '+g.totalMax+' pts':'— pts'}
+        ${moy10?`<span style="font-size:12px;display:block;font-weight:500;margin-top:2px">${moy10} / 10 &nbsp;·&nbsp; ${appr?.label}</span>`:''}
+      </div>
+    </div>
+    <div class="bull-foot">
+      <div><div style="color:var(--muted);font-size:9px">RANG</div><div style="font-weight:700;font-size:14px">${rang} / ${c.eleves.length}</div></div>
+      <div style="text-align:center"><div style="color:var(--muted);font-size:9px">MOY. CLASSE</div><div style="font-weight:700;font-size:14px">${moyC!==null?((moyC/g.totalMax)*10).toFixed(1)+'/10':'—'}</div></div>
+      <div style="text-align:right"><div style="color:var(--muted);font-size:9px">APPRÉCIATION</div><div style="font-weight:700;font-size:13px;color:${appr?.color}">${appr?.label||'—'}</div></div>
+    </div>
+    <div class="bull-sig"><span>Le Maître / La Maîtresse</span><span>Le(s) Parent(s)</span><span>Le(s) Directeur(trice)</span></div>
+  </div>`;
+}
+function printBull(){
+  const e=curStudent, c=curClasse, s=db.settings;
+  const tabKey=['c1','c2','c3'][bullTab-1];
+  const g=getGrille(tabKey);
+  const notes=e.notes?.[tabKey]||{};
+  const tot=getTotal(e,tabKey);
+  const appr=tot!==null?getAppr(tot,g.totalMax):null;
+  const rang=getRang(c,curStudent._idx,tabKey);
+  const moy10=tot!==null?((tot/g.totalMax)*10).toFixed(2):null;
+  let rows='';
+  g.matieres.forEach(m=>{
+    const v=notes[m.key]; const n=v!==undefined&&v!==''?parseFloat(v):null;
+    const ok=n!==null&&n/m.max>=0.5;
+    rows+=`<tr><td>${m.dom}</td><td>${m.mat}</td><td>${m.max}</td>
+      <td style="font-weight:700;color:${ok?'#1a6b3c':'#c0392b'}">${n!==null?n:'—'}</td>
+      <td style="color:${ok?'#1a6b3c':'#c0392b'};font-weight:600">${n!==null?(ok?'Oui':'Non'):'—'}</td></tr>`;
+  });
+  const w=window.open('','_blank');
+  if(!w){showToast('⚠️ Autorisez les pop-ups');return;}
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Bulletin ${e.prenom} ${e.nom}</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:12mm 10mm;font-size:10px;color:#1a1a2e}
+    .hdr{background:#1a6b3c;color:#fff;padding:8px 12px;text-align:center;border-radius:5px 5px 0 0}
+    .hdr h2{font-size:12px;margin:3px 0;font-weight:700}.hdr p{font-size:8px;margin:1px 0;opacity:.85}
+    .body{border:2px solid #1a6b3c;border-top:none;padding:9px 12px;border-radius:0 0 5px 5px}
+    .row{display:flex;justify-content:space-between;margin-bottom:2px}
+    .lbl{color:#6b7280}.val{font-weight:600}
+    hr{border:none;border-top:1px solid #e5e7eb;margin:7px 0}
+    table{width:100%;border-collapse:collapse;font-size:9px;margin-top:7px}
+    th{background:#e8f5ee;color:#1a6b3c;padding:3px 5px;border:1px solid #ccc;font-weight:700;text-align:left}
+    td{padding:3px 5px;border:1px solid #ccc}
+    .avg{font-size:16px;font-weight:700;text-align:center;padding:7px;color:${appr?.color||'#1a1a2e'}}
+    .foot{display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;padding-top:7px;margin-top:7px}
+    .sig{display:flex;justify-content:space-between;margin-top:18px;font-size:8px;color:#6b7280}
+    @media print{body{margin:5mm}}
+  </style></head><body>
+  <div class="hdr">
+    <p>République Du Sénégal – Un Peuple – Un But – Une Foi</p>
+    <h2>BULLETIN DE NOTES ${TRIM_LABEL[bullTab-1]} TRIMESTRE</h2>
+    <p>IA : ${s.ia||'—'} &nbsp;|&nbsp; IEF : ${s.ief||'—'} &nbsp;|&nbsp; A.S. : ${s.annee||'—'}</p>
+  </div>
+  <div class="body">
+    <div class="row"><span class="lbl">École :</span><span class="val">${s.ecole||'—'}</span></div>
+    <div class="row"><span class="lbl">District / CODEC :</span><span class="val">${[s.district,s.codec].filter(Boolean).join(' / ')||'—'}</span></div>
+    <div class="row"><span class="lbl">Maître :</span><span class="val">${s.maitre||'—'}</span></div>
+    <div class="row"><span class="lbl">Oustas :</span><span class="val">${s.oustas||'—'}</span></div>
+    <div class="row"><span class="lbl">Classe :</span><span class="val">${c.nom} &nbsp;|&nbsp; Effectif : ${c.eleves.length}</span></div>
+    <div class="row"><span class="lbl">Élève :</span><span class="val">${e.prenom} ${e.nom} ${e.sexe==='F'?'(Fille)':e.sexe==='M'?'(Garçon)':''}</span></div>
+    <hr/>
+    <table><thead><tr><th>Domaines</th><th>Disciplines</th><th>Max</th><th>Note</th><th>≥50%</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+    <div class="avg">${tot!==null?tot+' / '+g.totalMax+' pts':'— pts'}${moy10?`<br/><span style="font-size:11px">${moy10}/10 · ${appr?.label}</span>`:''}</div>
+    <div class="foot">
+      <div><div style="color:#999;font-size:8px">RANG</div><b>${rang} / ${c.eleves.length}</b></div>
+      <div style="text-align:center"><div style="color:#999;font-size:8px">MOY. CLASSE</div><b>${getTotal_moyClasse(c,tabKey)}</b></div>
+      <div style="text-align:right"><div style="color:#999;font-size:8px">APPRÉCIATION</div><b style="color:${appr?.color}">${appr?.label||'—'}</b></div>
+    </div>
+    <div class="sig"><span>Le Maître / La Maîtresse</span><span>Le(s) Parent(s)</span><span>Le(s) Directeur(trice)</span></div>
+  </div>
+  <script>window.print();setTimeout(()=>window.close(),1500);<\/script>
+  </body></html>`);
+  w.document.close();
+}
+function getTotal_moyClasse(c,tab){
+  const g=getGrille(tab); const tots=c.eleves.map(e=>getTotal(e,tab)).filter(t=>t!==null);
+  if(!tots.length) return '—';
+  const m=tots.reduce((s,t)=>s+t,0)/tots.length;
+  return ((m/g.totalMax)*10).toFixed(1)+'/10';
+}
+
+// ═══════════════════════════════════════════════
+//  SYNTHESE
+// ═══════════════════════════════════════════════
+function setSynTab(tab){
+  synTab=tab;
+  document.querySelectorAll('#syn-tabs .tab').forEach((t,i)=>t.classList.toggle('active',TABS[i]===tab));
+  renderSynthese();
+}
+function renderSynthese(){
+  const body=document.getElementById('syn-body');
+  if(!db.classes.length){body.innerHTML=`<div class="empty"><div class="empty-ic">📊</div><div class="empty-t">Aucune classe</div></div>`;return;}
+  const g=getGrille(synTab);
+  let html='';
+  db.classes.forEach(c=>{
+    if(!c.eleves.length) return;
+    const tots=c.eleves.map(e=>getTotal(e,synTab)).filter(t=>t!==null);
+    if(!tots.length){
+      html+=`<div style="background:#fff;border-radius:var(--r);padding:14px;box-shadow:var(--sh);margin-bottom:10px">
+        <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--g);margin-bottom:6px">${c.emoji||'📚'} ${c.nom} – ${TAB_FULL[synTab]}</div>
+        <div class="text-muted">Aucune note saisie pour cet onglet</div></div>`;
+      return;
+    }
+    const moy=(tots.reduce((s,t)=>s+t,0)/tots.length);
+    const admis=tots.filter(t=>t/g.totalMax>=.5).length;
+    const taux=Math.round(admis/tots.length*100);
+    const elevF=c.eleves.filter(e=>e.sexe==='F');
+    const elevG=c.eleves.filter(e=>e.sexe==='M');
+    const totsF=elevF.map(e=>getTotal(e,synTab)).filter(t=>t!==null);
+    const totsG=elevG.map(e=>getTotal(e,synTab)).filter(t=>t!==null);
+    const moyF=totsF.length?(totsF.reduce((s,t)=>s+t,0)/totsF.length).toFixed(1):'—';
+    const moyG=totsG.length?(totsG.reduce((s,t)=>s+t,0)/totsG.length).toFixed(1):'—';
+    const admisF=totsF.filter(t=>t/g.totalMax>=.5).length;
+    const admisG=totsG.filter(t=>t/g.totalMax>=.5).length;
+
+    html+=`<div style="background:#fff;border-radius:var(--r);padding:14px;box-shadow:var(--sh);margin-bottom:10px">
+      <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--g);margin-bottom:10px">${c.emoji||'📚'} ${c.nom} – ${TAB_FULL[synTab]}</div>
+      <div class="sg" style="margin-bottom:10px">
+        <div class="sc"><div class="sn">${tots.length}</div><div class="sl">Ayant composé</div></div>
+        <div class="sc"><div class="sn" style="color:${taux>=50?'var(--g)':'var(--red)'}">${taux}%</div><div class="sl">Taux de réussite</div></div>
+        <div class="sc"><div class="sn">${moy.toFixed(1)}</div><div class="sl">Moy. totale (pts)</div></div>
+        <div class="sc"><div class="sn">${((moy/g.totalMax)*10).toFixed(1)}</div><div class="sl">Moy. /10</div></div>
+        <div class="sc"><div class="sn" style="color:#2980b9">${moyF}</div><div class="sl">Moy. Filles (${totsF.length})</div></div>
+        <div class="sc"><div class="sn" style="color:#e67e22">${moyG}</div><div class="sl">Moy. Garçons (${totsG.length})</div></div>
+      </div>
+      ${g.matieres.map(m=>{
+        const vals=c.eleves.map(e=>{const v=e.notes?.[synTab]?.[m.key];return v!==undefined&&v!==''?parseFloat(v):null;}).filter(v=>v!==null);
+        if(!vals.length) return '';
+        const mm=(vals.reduce((s,v)=>s+v,0)/vals.length);
+        const pctM=Math.round(mm/m.max*100);
+        const nbAdm=vals.filter(v=>v/m.max>=.5).length;
+        return `<div class="bar-item">
+          <div class="bar-lbl">
+            <span><b>${m.dom}</b> – ${m.mat}</span>
+            <span style="color:${pctM>=50?'var(--g)':'var(--red)'};font-weight:700">${mm.toFixed(1)}/${m.max} (${nbAdm}/${vals.length} ≥50%)</span>
+          </div>
+          <div class="bar-tr"><div class="bar-fl" style="width:${pctM}%;background:${pctM>=50?'var(--g)':'var(--red)'}"></div></div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  });
+  body.innerHTML=html||`<div class="empty"><div class="empty-ic">📊</div><div class="empty-t">Aucune donnée disponible</div></div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  PROPOSITION DE PASSAGE
+// ═══════════════════════════════════════════════
+function renderPassage(){
+  const body=document.getElementById('passage-body');
+  if(!db.classes.length){body.innerHTML=`<div class="empty"><div class="empty-ic">🎓</div><div class="empty-t">Aucune classe</div></div>`;return;}
+  const g=getGrille('c1');
+  let html='';
+  db.classes.forEach((c,ci)=>{
+    if(!c.eleves.length) return;
+    html+=`<div style="margin-bottom:14px"><div class="sec-title">${c.emoji||'📚'} ${c.nom}</div>`;
+    html+=c.eleves.map((e,ei)=>{
+      const avgs=['c1','c2','c3'].map(tab=>getTotal(e,tab));
+      const vals=avgs.filter(a=>a!==null);
+      const annuel=vals.length?Math.round(vals.reduce((s,a)=>s+a,0)/vals.length):null;
+      const pct=annuel!==null?Math.round(annuel/g.totalMax*100):null;
+      const appr=annuel!==null?getAppr(annuel,g.totalMax):null;
+      let dec='';
+      if(vals.length===3){
+        dec=pct>=50
+          ?`<span class="pp-dec" style="background:#e8f5ee;color:#1a6b3c">✅ Passage proposé</span>`
+          :`<span class="pp-dec" style="background:#fdecea;color:#c0392b">🔄 Redoublement proposé</span>`;
+      } else {
+        dec=`<span class="pp-dec" style="background:#f3f4f6;color:#6b7280">⏳ ${vals.length}/3 compos saisies</span>`;
+      }
+      const col=AVCOLS[ei%AVCOLS.length];
+      const ini=(e.prenom?.[0]||'')+(e.nom?.[0]||'');
+      return `<div class="pp-item">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+          <div class="st-av" style="background:${col};width:32px;height:32px;font-size:12px">${ini.toUpperCase()}</div>
+          <div>
+            <div style="font-weight:700;font-size:13px">${e.prenom} ${e.nom}</div>
+            <div class="text-muted">${e.sexe==='F'?'Fille':e.sexe==='M'?'Garçon':''}</div>
+          </div>
+        </div>
+        <div class="pp-avgs">
+          ${['c1','c2','c3'].map((tab,i)=>{
+            const a=avgs[i];
+            const p=a!==null?Math.round(a/g.totalMax*100):null;
+            return `<div class="pp-avg" style="background:${a!==null?(p>=50?'var(--gp)':'var(--rdp)'):'var(--surf)'}">
+              <div class="pp-av-n" style="color:${a!==null?(p>=50?'var(--g)':'var(--red)'):'var(--muted)'}">${a!==null?a:'—'}</div>
+              <div class="pp-av-l">Compo ${i+1}${a!==null?' ('+p+'%)':''}</div>
+            </div>`;
+          }).join('')}
+          <div class="pp-avg" style="background:${annuel!==null?(pct>=50?'var(--gp)':'var(--rdp)'):'var(--surf)'}">
+            <div class="pp-av-n" style="color:${annuel!==null?(pct>=50?'var(--g)':'var(--red)'):'var(--muted)'}">${annuel!==null?annuel:'—'}</div>
+            <div class="pp-av-l">Annuel${annuel?` (${pct}%)`:''}</div>
+          </div>
+        </div>
+        ${dec}
+      </div>`;
+    }).join('');
+    html+='</div>';
+  });
+  body.innerHTML=html||`<div class="empty"><div class="empty-ic">🎓</div><div class="empty-t">Aucune donnée</div></div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  PARAMS
+// ═══════════════════════════════════════════════
+function renderParams(){
+  document.getElementById('param-classes').innerHTML=db.classes.map((c,i)=>`
+  <div class="set-item">
+    <div class="set-ic">${c.emoji||'📚'}</div>
+    <div style="flex:1"><div class="set-lbl">${c.nom}</div><div class="set-val">${c.eleves.length} élève${c.eleves.length>1?'s':''} · ${c.type}</div></div>
+    <button class="btn btn-sm btn-d" onclick="delClasse(${i},event)">Suppr.</button>
+  </div>`).join('');
+}
+function editParam(key, label){
+  showModal(`<div class="mo-title">✏️ ${label}</div>
+  <div class="fg"><label class="fl">${label}</label>
+  <input type="text" class="fc" id="pi" value="${db.settings[key]||''}" placeholder="Saisir..."></div>
+  <button class="btn btn-p btn-bl" onclick="saveParam('${key}')">Enregistrer</button>`);
+  setTimeout(()=>document.getElementById('pi')?.focus(),100);
+}
+function saveParam(key){
+  db.settings[key]=document.getElementById('pi').value.trim();
+  saveDB(); closeModal(); renderHome(); showToast('✅ Enregistré');
+}
+function delClasse(i,ev){
+  ev.stopPropagation();
+  if(!confirm(`Supprimer "${db.classes[i].nom}" et tous ses élèves ?`)) return;
+  db.classes.splice(i,1); saveDB(); renderParams(); renderHome(); showToast('Classe supprimée');
+}
+function exportDB(){
+  const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const u=URL.createObjectURL(b), a=document.createElement('a');
+  a.href=u; a.download=`suiviclasse_${db.settings.annee||'2025-2026'}_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(u); showToast('📤 Exporté');
+}
+function importDB(){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
+  inp.onchange=ev=>{
+    const f=ev.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=e=>{try{const d=JSON.parse(e.target.result);if(d.classes&&d.settings){db=d;saveDB();navigate('home',false);showToast('✅ Import réussi');}else showToast('❌ Fichier invalide');}catch{showToast('❌ Erreur de lecture');}};
+    r.readAsText(f);
+  }; inp.click();
+}
+
+// ═══════════════════════════════════════════════
+//  ADD CLASSE / ELEVE
+// ═══════════════════════════════════════════════
+function showAddClasseModal(){
+  showModal(`<div class="mo-title">🏫 Nouvelle classe</div>
+  <div class="fg"><label class="fl">Nom de la classe</label><input type="text" class="fc" id="cn" placeholder="Ex: CM, CE1, CI..."></div>
+  <div class="fg"><label class="fl">Niveau / Type</label>
+  <select class="fc" id="ct"><option>Standard</option><option>Multigrades (CMG)</option><option>Double flux (CDF)</option></select></div>
+  <div class="fg"><label class="fl">Icône</label>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px" id="epp">
+    ${['📚','🏫','✏️','📖','🎒','🔬','🌍','🎨','⭐','🌟'].map((em,i)=>`
+    <button type="button" onclick="selE('${em}',this)" style="font-size:22px;background:var(--surf);border:2px solid ${i===0?'var(--g)':'transparent'};border-radius:7px;padding:3px;cursor:pointer">${em}</button>`).join('')}
+  </div><input type="hidden" id="ce" value="📚"></div>
+  <button class="btn btn-p btn-bl" onclick="addClasse()">Créer la classe</button>`);
+  setTimeout(()=>document.getElementById('cn')?.focus(),100);
+}
+function selE(em,btn){
+  document.querySelectorAll('#epp button').forEach(b=>b.style.borderColor='transparent');
+  btn.style.borderColor='var(--g)'; document.getElementById('ce').value=em;
+}
+function addClasse(){
+  const nom=document.getElementById('cn').value.trim();
+  if(!nom){showToast('⚠️ Nom requis');return;}
+  db.classes.push({nom,type:document.getElementById('ct').value,emoji:document.getElementById('ce').value,eleves:[]});
+  saveDB(); closeModal(); renderHome(); showToast(`✅ Classe "${nom}" créée`);
+}
+function showAddStudentModal(){
+  if(!curClasse){showToast('⚠️ Sélectionnez une classe d\'abord');return;}
+  showModal(`<div class="mo-title">👦 Nouvel élève – ${curClasse.nom}</div>
+  <div class="fg"><label class="fl">Prénom</label><input type="text" class="fc" id="ep" placeholder="Prénom"></div>
+  <div class="fg"><label class="fl">Nom</label><input type="text" class="fc" id="en" placeholder="Nom de famille"></div>
+  <div class="fg"><label class="fl">Sexe</label>
+  <select class="fc" id="es"><option value="">Non précisé</option><option value="M">Garçon 👦</option><option value="F">Fille 👧</option></select></div>
+  <button class="btn btn-p btn-bl" onclick="addStudent()">Ajouter l'élève</button>
+  <button class="btn btn-s btn-bl mt8" onclick="showBulkModal()">📋 Import en lot (liste)</button>`);
+  setTimeout(()=>document.getElementById('ep')?.focus(),100);
+}
+function addStudent(){
+  const p=document.getElementById('ep').value.trim(), n=document.getElementById('en').value.trim();
+  if(!p||!n){showToast('⚠️ Prénom et nom requis');return;}
+  curClasse.eleves.push({prenom:p,nom:n,sexe:document.getElementById('es').value,notes:{}});
+  db.classes[curClasse._idx]=curClasse; saveDB(); closeModal(); renderSaisie();
+  showToast(`✅ ${p} ${n} ajouté·e`);
+}
+function showBulkModal(){
+  showModal(`<div class="mo-title">📋 Import en lot – ${curClasse.nom}</div>
+
+  <!-- FORMAT TABS -->
+  <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+    <button class="btn btn-p btn-sm" onclick="showImportTab('text')" id="itab-text">📝 Texte</button>
+    <button class="btn btn-s btn-sm" onclick="showImportTab('file')" id="itab-file">📊 Excel/Word/PDF</button>
+    <button class="btn btn-s btn-sm" onclick="showImportTab('image')" id="itab-image">📷 Photo/Image</button>
+  </div>
+
+  <!-- TEXT TAB -->
+  <div id="import-text">
+    <div class="text-muted" style="margin-bottom:8px">Un élève par ligne : <b>Prénom Nom</b> (optionnel : M ou F en fin)</div>
+    <textarea class="fc" id="bi" rows="8" placeholder="Mamadou Diallo M&#10;Fatou Ndiaye F&#10;Ibrahima Sow&#10;Aissatou Fall F"></textarea>
+    <button class="btn btn-p btn-bl mt8" onclick="importBulkText()">Importer la liste</button>
+  </div>
+
+  <!-- FILE TAB -->
+  <div id="import-file" style="display:none">
+    <div style="border:2px dashed var(--border);border-radius:var(--rs);padding:24px;text-align:center;cursor:pointer;background:var(--surf)" onclick="document.getElementById('file-inp').click()">
+      <div style="font-size:36px;margin-bottom:8px">📄</div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">Cliquer pour choisir un fichier</div>
+      <div class="text-muted">Excel (.xlsx .xls) · Word (.docx) · PDF (.pdf)</div>
+    </div>
+    <input type="file" id="file-inp" accept=".xlsx,.xls,.docx,.doc,.pdf" style="display:none" onchange="handleFileImport(this)"/>
+    <div id="file-status" style="margin-top:10px"></div>
+  </div>
+
+  <!-- IMAGE TAB -->
+  <div id="import-image" style="display:none">
+    <div style="border:2px dashed var(--border);border-radius:var(--rs);padding:24px;text-align:center;cursor:pointer;background:var(--surf)" onclick="document.getElementById('img-inp').click()">
+      <div style="font-size:36px;margin-bottom:8px">📷</div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">Cliquer pour choisir une image</div>
+      <div class="text-muted">JPG · PNG · Photo de liste manuscrite ou imprimée</div>
+    </div>
+    <input type="file" id="img-inp" accept="image/*" style="display:none" onchange="handleImageImport(this)"/>
+    <div id="img-status" style="margin-top:10px"></div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="import-preview" style="display:none;margin-top:12px">
+    <div style="font-family:var(--fd);font-size:13px;font-weight:700;margin-bottom:8px;color:var(--g)">✅ Élèves détectés – vérifiez avant d'importer</div>
+    <div id="preview-list" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--rs);background:var(--surf);padding:8px;font-size:12px;margin-bottom:10px"></div>
+    <button class="btn btn-p btn-bl" onclick="confirmImport()">✅ Confirmer l'import</button>
+    <button class="btn btn-d btn-bl mt8" onclick="cancelImport()">✗ Annuler</button>
+  </div>`);
+}
+
+function showImportTab(tab){
+  ['text','file','image'].forEach(t=>{
+    document.getElementById('import-'+t).style.display = t===tab?'block':'none';
+    const btn=document.getElementById('itab-'+t);
+    if(btn){ btn.className = t===tab ? 'btn btn-p btn-sm' : 'btn btn-s btn-sm'; }
+  });
+  document.getElementById('import-preview').style.display='none';
+}
+
+// ── TEXTE ──
+function importBulkText(){
+  const lines=document.getElementById('bi').value.split('\n').filter(l=>l.trim());
+  const parsed=parseLines(lines);
+  if(!parsed.length){showToast('⚠️ Aucun élève détecté');return;}
+  showPreview(parsed);
+}
+
+// ── FICHIER EXCEL / WORD / PDF ──
+async function handleFileImport(input){
+  const file=input.files[0]; if(!file) return;
+  const statusEl=document.getElementById('file-status');
+  statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs)">⏳ Lecture du fichier en cours…</div>`;
+
+  try {
+    const ext=file.name.split('.').pop().toLowerCase();
+    let text='';
+
+    if(['xlsx','xls'].includes(ext)){
+      text = await readExcel(file);
+    } else if(['docx','doc'].includes(ext)){
+      text = await readDocx(file);
+    } else if(ext==='pdf'){
+      text = await readPdfViaAI(file);
+      // PDF goes directly through AI
+      return;
+    }
+
+    if(text){
+      statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--gp);color:var(--g)">✅ Fichier lu – extraction des noms…</div>`;
+      await extractNamesViaAI(text, statusEl);
+    }
+  } catch(err){
+    statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--rdp);color:var(--red)">❌ Erreur : ${err.message}</div>`;
+  }
+}
+
+async function readExcel(file){
+  // Use SheetJS via CDN
+  return new Promise((resolve, reject)=>{
+    const script=document.createElement('script');
+    script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    script.onload=()=>{
+      const reader=new FileReader();
+      reader.onload=e=>{
+        try{
+          const wb=XLSX.read(e.target.result,{type:'binary'});
+          let allText='';
+          wb.SheetNames.forEach(name=>{
+            const ws=wb.Sheets[name];
+            const csv=XLSX.utils.sheet_to_csv(ws);
+            allText+=csv+'\n';
+          });
+          resolve(allText);
+        }catch(err){reject(err);}
+      };
+      reader.readAsBinaryString(file);
+    };
+    script.onerror=()=>reject(new Error('Impossible de charger SheetJS'));
+    if(!window.XLSX) document.head.appendChild(script);
+    else {
+      const reader=new FileReader();
+      reader.onload=e=>{
+        try{
+          const wb=XLSX.read(e.target.result,{type:'binary'});
+          let allText='';
+          wb.SheetNames.forEach(name=>{
+            const ws=wb.Sheets[name];
+            allText+=XLSX.utils.sheet_to_csv(ws)+'\n';
+          });
+          resolve(allText);
+        }catch(err){reject(err);}
+      };
+      reader.readAsBinaryString(file);
+    }
+  });
+}
+
+async function readDocx(file){
+  return new Promise((resolve,reject)=>{
+    const loadMammoth=()=>{
+      const reader=new FileReader();
+      reader.onload=async e=>{
+        try{
+          const result=await mammoth.extractRawText({arrayBuffer:e.target.result});
+          resolve(result.value);
+        }catch(err){reject(err);}
+      };
+      reader.readAsArrayBuffer(file);
+    };
+    if(!window.mammoth){
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+      s.onload=loadMammoth; s.onerror=()=>reject(new Error('Impossible de charger Mammoth'));
+      document.head.appendChild(s);
+    } else loadMammoth();
+  });
+}
+
+// ── IMAGE ──
+async function handleImageImport(input){
+  const file=input.files[0]; if(!file) return;
+  const statusEl=document.getElementById('img-status');
+  statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs)">⏳ Analyse de l'image par IA…</div>`;
+
+  try{
+    // Show preview of image
+    const previewUrl=URL.createObjectURL(file);
+    statusEl.innerHTML+=`<img src="${previewUrl}" style="width:100%;border-radius:var(--rs);margin-top:8px;max-height:200px;object-fit:contain;border:1px solid var(--border)"/>`;
+
+    const b64=await fileToBase64(file);
+    const mediaType=file.type||'image/jpeg';
+    await extractNamesFromImage(b64, mediaType, statusEl);
+  }catch(err){
+    statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--rdp);color:var(--red)">❌ ${err.message}</div>`;
+  }
+}
+
+// ── AI EXTRACTION ──
+async function extractNamesViaAI(text, statusEl){
+  statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs)">🤖 IA en cours d'analyse…</div>`;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        messages:[{role:'user',content:`Voici le contenu d'un fichier contenant une liste d'élèves sénégalais.
+Extrais uniquement les noms et prénoms des élèves. Pour chaque élève détecté, retourne une ligne au format:
+PRENOM NOM SEXE
+où SEXE est M (garçon), F (fille), ou vide si non déterminable.
+Ne retourne QUE les lignes des élèves, rien d'autre, pas de numéros, pas d'en-têtes.
+
+Contenu:
+${text.slice(0,3000)}`}]
+      })
+    });
+    const data=await resp.json();
+    const result=data.content?.[0]?.text||'';
+    const parsed=parseLines(result.split('\n').filter(l=>l.trim()));
+    if(!parsed.length){statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--rdp);color:var(--red)">❌ Aucun élève détecté dans ce fichier</div>`;return;}
+    statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--gp);color:var(--g)">✅ ${parsed.length} élève${parsed.length>1?'s':''} détecté${parsed.length>1?'s':''}</div>`;
+    showPreview(parsed);
+  }catch(err){
+    statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--rdp);color:var(--red)">❌ Erreur IA : ${err.message}</div>`;
+  }
+}
+
+async function readPdfViaAI(file){
+  const statusEl=document.getElementById('file-status');
+  statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs)">🤖 Analyse du PDF par IA…</div>`;
+  const b64=await fileToBase64(file);
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        messages:[{role:'user',content:[
+          {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
+          {type:'text',text:`Extrais uniquement les noms et prénoms des élèves de ce document.
+Pour chaque élève, retourne une ligne: PRENOM NOM SEXE (M ou F si visible, sinon vide).
+Ne retourne QUE les lignes élèves, rien d'autre.`}
+        ]}]
+      })
+    });
+    const data=await resp.json();
+    const result=data.content?.[0]?.text||'';
+    const parsed=parseLines(result.split('\n').filter(l=>l.trim()));
+    if(!parsed.length){statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--rdp);color:var(--red)">❌ Aucun élève détecté dans ce PDF</div>`;return;}
+    statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--gp);color:var(--g)">✅ ${parsed.length} élève${parsed.length>1?'s':''} détecté${parsed.length>1?'s':''}</div>`;
+    showPreview(parsed);
+  }catch(err){
+    statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--rdp);color:var(--red)">❌ Erreur : ${err.message}</div>`;
+  }
+}
+
+async function extractNamesFromImage(b64, mediaType, statusEl){
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens:1000,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mediaType,data:b64}},
+        {type:'text',text:`Cette image contient une liste d'élèves sénégalais (manuscrite ou imprimée).
+Extrais tous les noms et prénoms visibles.
+Pour chaque élève, retourne une ligne au format: PRENOM NOM SEXE
+où SEXE est M (garçon) ou F (fille) si visible/déductible, sinon laisse vide.
+Ne retourne QUE les lignes élèves, rien d'autre.`}
+      ]}]
+    })
+  });
+  const data=await resp.json();
+  const result=data.content?.[0]?.text||'';
+  const parsed=parseLines(result.split('\n').filter(l=>l.trim()));
+  if(!parsed.length){
+    statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--rdp);color:var(--red)">❌ Aucun nom détecté dans l'image</div>`;
+    return;
+  }
+  statusEl.innerHTML=`<div class="info-band" style="border-radius:var(--rs);background:var(--gp);color:var(--g)">✅ ${parsed.length} élève${parsed.length>1?'s':''} détecté${parsed.length>1?'s':''}</div>`;
+  showPreview(parsed);
+}
+
+// ── SHARED HELPERS ──
+function fileToBase64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=()=>rej(new Error('Lecture fichier échouée'));
+    r.readAsDataURL(file);
+  });
+}
+
+let _pendingImport=[];
+function parseLines(lines){
+  const result=[];
+  lines.forEach(line=>{
+    const raw=line.trim().replace(/^\d+[\.\):\-\s]+/,''); // remove numbering
+    if(!raw || raw.length<3) return;
+    const parts=raw.split(/\s+/);
+    if(parts.length<2) return;
+    let sexe='';
+    const last=parts[parts.length-1].toUpperCase();
+    if(last==='M'||last==='F'){sexe=last;parts.pop();}
+    const prenom=parts[0];
+    const nom=parts.slice(1).join(' ');
+    if(prenom && nom) result.push({prenom,nom,sexe});
+  });
+  return result;
+}
+function showPreview(parsed){
+  _pendingImport=parsed;
+  document.getElementById('import-preview').style.display='block';
+  document.getElementById('preview-list').innerHTML=parsed.map((e,i)=>
+    `<div style="padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+      <span><b>${i+1}.</b> ${e.prenom} ${e.nom}</span>
+      <span class="badge ${e.sexe==='F'?'bg-r':e.sexe==='M'?'bg-g':'bg-gray'}">${e.sexe||'—'}</span>
+    </div>`).join('');
+}
+function confirmImport(){
+  if(!_pendingImport.length) return;
+  _pendingImport.forEach(e=>curClasse.eleves.push({...e,notes:{}}));
+  db.classes[curClasse._idx]=curClasse; saveDB(); closeModal(); renderSaisie();
+  showToast(`✅ ${_pendingImport.length} élève${_pendingImport.length>1?'s':''} importé${_pendingImport.length>1?'s':''}`);
+  _pendingImport=[];
+}
+function cancelImport(){
+  _pendingImport=[];
+  document.getElementById('import-preview').style.display='none';
+}
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function getTotal(e, tab){
+  const g=getGrille(tab);
+  const notes=e.notes?.[tab]||{};
+  let tot=0, any=false;
+  g.matieres.forEach(m=>{
+    const v=notes[m.key];
+    if(v!==undefined&&v!==''&&!isNaN(parseFloat(v))){ tot+=parseFloat(v); any=true; }
+  });
+  return any ? Math.round(tot*10)/10 : null;
+}
+function getRang(c, idx, tab){
+  const tots=c.eleves.map(e=>getTotal(e,tab));
+  const my=tots[idx]; if(my===null) return '—';
+  const sorted=[...tots].filter(t=>t!==null).sort((a,b)=>b-a);
+  return sorted.indexOf(my)+1;
+}
+function getMoyenneClasse(c, tab){
+  const tots=c.eleves.map(e=>getTotal(e,tab)).filter(t=>t!==null);
+  return tots.length ? tots.reduce((s,t)=>s+t,0)/tots.length : null;
+}
+function getClasseMoyenne(c, tab){
+  const m=getMoyenneClasse(c,tab);
+  return m!==null ? Math.round(m*10)/10 : null;
+}
+
+// ═══════════════════════════════════════════════
+//  MODAL / TOAST
+// ═══════════════════════════════════════════════
+function showModal(html){ document.getElementById('modal-body').innerHTML=html; document.getElementById('modal').classList.add('open'); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function moOverlay(e){ if(e.target.id==='modal') closeModal(); }
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(toastT); toastT=setTimeout(()=>t.style.display='none',2800);
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  navigate('home', false);
+});
+</script>
+</body>
+</html>

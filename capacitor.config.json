@@ -1,0 +1,8 @@
+{
+  "appId": "sn.suiviclasse.app",
+  "appName": "SuiviClasse SN",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

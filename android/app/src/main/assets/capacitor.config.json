@@ -1,0 +1,12 @@
+{
+	"appId": "sn.suiviclasse.app",
+	"appName": "SuiviClasse SN",
+	"webDir": "www",
+	"server": {
+		"androidScheme": "https"
+	},
+	"android": {
+		"allowMixedContent": true,
+		"backgroundColor": "#1a6b3c"
+	}
+}
